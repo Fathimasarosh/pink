@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .navbar-gradient {
+      background: linear-gradient(45deg, #3c42b2, #2575fc);
+    }
+    .navbar-brand img { height: 40px; }
+    .container { padding-top: 3rem; }
+    .btn-buy:hover { background-color: #084cdf; transform: scale(1.05); }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-gradient">
+    <div class="container-fluid">
+      <a class="navbar-brand me-3" href="#">
+       storecart
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Features</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Pricing</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+        </ul>
+        <div class="d-flex align-items-center">
+          <a class="btn btn-outline-light me-2" href="cart.html">Cart (<span id="cartItemCount">0</span>)</a>
+          <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search">
+            <button class="btn btn-outline-light" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2>Checkout</h2>
+    <div id="checkoutItems"></div>
+    <div class="text-end mt-4">
+      <button class="btn btn-success" onclick="makePayment()">Make Payment</button>
+    </div>
+  </div>
+
+  <script>
+    function loadCheckout() {
+      const cart = JSON.parse(localStorage.getItem("cart")) || {};
+      let checkoutItemsHTML = '';
+      let totalPrice = 0;
+
+      for (let productId in cart) {
+        const product = cart[productId];
+        const subtotal = parseFloat(product.price.replace('$', '')) * product.quantity;
+
+        checkoutItemsHTML += `
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <img src="${product.image}" alt="${product.name}" class="img-fluid" style="max-height: 100px;">
+              <span class="ms-3">${product.name}</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <span class="ms-2">${product.quantity}</span>
+              <span class="ms-2">($${subtotal.toFixed(2)})</span>
+            </div>
+          </div>
+        `;
+
+        totalPrice += subtotal;
+      }
+
+      document.getElementById("checkoutItems").innerHTML = checkoutItemsHTML;
+      document.querySelector(".container").innerHTML += `<h4>Total: $${totalPrice.toFixed(2)}</h4>`;
+    }
+
+    function makePayment() {
+      
+      alert("Payment Successful!");
+      window.location.href = "success.html"; 
+    }
+
+    
+    loadCheckout();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

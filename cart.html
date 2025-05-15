@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shopping Cart</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .navbar-gradient { background: linear-gradient(45deg, #3c42b2, #2575fc); }
+    .navbar-brand img { height: 40px; }
+    .container { padding-top: 3rem; }
+    .btn-buy:hover { background-color: #084cdf; transform: scale(1.05); }
+    
+
+    .btn-quantity {
+      background-color: #6c757d; 
+      color: white;
+      border: none;
+    }
+
+    .btn-quantity:hover {
+      background-color: #5a6268; 
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-gradient">
+    <div class="container-fluid">
+      <a class="navbar-brand me-3" href="#">
+       storecart
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Features</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Pricing</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+        </ul>
+        <div class="d-flex align-items-center">
+          <a class="btn btn-outline-light me-2" href="cart.html">Cart (<span id="cartItemCount">0</span>)</a>
+          <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search">
+            <button class="btn btn-outline-light" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2>Your Shopping Cart</h2>
+    <div id="cartItems"></div>
+    <div class="d-flex justify-content-between mt-4">
+      <button class="btn btn-danger" onclick="clearCart()">Clear Cart</button>
+      <div id="totalPrice" class="fs-4">Total: $0.00</div>
+      <a href="checkout.html" class="btn btn-success ms-3">Proceed to Checkout</a>
+    </div>
+  </div>
+
+  <script>
+    function loadCart() {
+      const cart = JSON.parse(localStorage.getItem("cart")) || {};
+      let cartItemsHTML = '';
+      let totalPrice = 0;
+
+      for (let productId in cart) {
+        const product = cart[productId];
+        const subtotal = parseFloat(product.price.replace('$', '')) * product.quantity;
+
+        cartItemsHTML += `
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <img src="${product.image}" alt="${product.name}" class="img-fluid" style="max-height: 100px;">
+              <span class="ms-3">${product.name}</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <button class="btn btn-sm btn-quantity" onclick="removeFromCart('${productId}')">-</button>
+              <span class="ms-2">${product.quantity}</span>
+              <button class="btn btn-sm btn-quantity" onclick="addToCart('${productId}')">+</button>
+            </div>
+            <div>
+              <span>${product.price}</span>
+              <span> - Subtotal: $${subtotal.toFixed(2)}</span>
+            </div>
+          </div>
+        `;
+        
+        totalPrice += subtotal;
+      }
+
+      document.getElementById('cartItems').innerHTML = cartItemsHTML;
+      document.getElementById('totalPrice').textContent = `Total: $${totalPrice.toFixed(2)}`;
+      updateCartCount();
+    }
+
+    function removeFromCart(productId) {
+      let cart = JSON.parse(localStorage.getItem("cart")) || {};
+      if (cart[productId].quantity > 1) {
+        cart[productId].quantity -= 1;
+      } else {
+        delete cart[productId];
+      }
+      localStorage.setItem("cart", JSON.stringify(cart));
+      loadCart();
+    }
+
+    function addToCart(productId) {
+      let cart = JSON.parse(localStorage.getItem("cart")) || {};
+      if (cart[productId]) {
+        cart[productId].quantity += 1;
+      }
+      localStorage.setItem("cart", JSON.stringify(cart));
+      loadCart();
+    }
+
+    function clearCart() {
+      localStorage.removeItem("cart");
+      loadCart();
+    }
+
+    function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem("cart")) || {};
+      const itemCount = Object.keys(cart).length;
+      document.getElementById('cartItemCount').textContent = itemCount;
+    }
+
+    loadCart();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
